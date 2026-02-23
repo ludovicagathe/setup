@@ -24,7 +24,7 @@ ask_confirmation() {
   if [[ -z "$1" ]]; then
     PROMPT="Confirm (y/n): ";
   else
-    PROMPT="$1\nConfirm (y/n): "
+    PROMPT="$1"$'\nConfirm (y/n): '
   fi
   read -p "$PROMPT" -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]
@@ -86,6 +86,7 @@ check_and_create_file() {
 user_dirs=("logs" "repos" "setup")
 user_files=("/logs/init.log" "/logs/errors.log")
 # check_and_create_dir "${user_dirs[@]}"
-#backup_folder "test" "bkp_"
-ask_confirmation "Some prompt"
+backup_folder "test" "bkp_"
+
+
 cd $PREV_DIR
