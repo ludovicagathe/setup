@@ -6,14 +6,15 @@ CYAN='\033[0;36m' # In progress
 GREEN='\033[1;32m' # Success
 NC='\033[0m' # No color
 # SET BASE DIRECTORY
-if [[ $(basename $PWD) == "tests" ]]; then
-  BASE_DIR=$PWD;
-else
+if [[ $(basename $PWD) == "setup" ]]; then
   BASE_DIR=$HOME;
+else
+  BASE_DIR=$PWD;
 fi
 PREV_DIR=$(pwd)
 cd $BASE_DIR
 
+# FUNCTION DEFINITIONS
 # RETURN A TIMESTAMP - DATE STRING WITH TIME
 date_string() {
   echo $(date +%Y%m%d%H%M%S)
@@ -65,7 +66,10 @@ backup_folder() {
   else
     EXCLUDE=""
   fi
-  pwd
+
+  # list backup folder found
+
+  # force excluded backup
   echo "$1"
   ls "$1"
   if [[ -d "$1" ]]; then

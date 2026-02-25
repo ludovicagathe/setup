@@ -11,6 +11,8 @@ if [[ $(basename $PWD) == "tests" ]]; then
 else
   BASE_DIR=$HOME;
 fi
+PREV_DIR=$(pwd)
+cd $BASE_DIR
 
 # FUNCTION DEFINITIONS
 # RETURN A TIMESTAMP - DATE STRING WITH TIME
