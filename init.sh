@@ -6,13 +6,14 @@ CYAN='\033[0;36m' # In progress
 GREEN='\033[1;32m' # Success
 NC='\033[0m' # No color
 # SET BASE DIRECTORY
-if [[ $(basename $PWD) == "tests" ]]; then
-  BASE_DIR=$PWD;
-else
+if [[ $(basename $PWD) == "setup" ]]; then
   BASE_DIR=$HOME;
+else
+  BASE_DIR=$PWD/test_home;
 fi
 PREV_DIR=$(pwd)
 cd $BASE_DIR
+pwd
 
 # FUNCTION DEFINITIONS
 # RETURN A TIMESTAMP - DATE STRING WITH TIME
@@ -59,6 +60,46 @@ check_and_create_dir () {
   done
 }
 
+# Parse options using getops
+parse_opts() {
+  local OPTIND=1
+  local opt
+  local rem_args=()
+  local a=false
+
+  while getopts ":vf:ar:" opt; do
+    case "$opt" in
+      v)
+        echo "Verbose mode (-$opt)"
+        ;;
+      f)
+        echo "File required (-$opt): $OPTARG"
+        ;;
+      a)
+        a=true
+        echo "All mode (-a): $a"
+        ;;
+      r)
+        echo "Recurse files (-r): $OPTARG"
+        ;;
+      \?) # invalid options
+        echo "Invalid option: -$OPTARG" >&2
+        ;;
+      :) # missing arguments
+        echo "Option -$OPTARG requires an argument" >&2
+        ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  # store and print remaining arguments
+  if [[ ! -z "${@}" ]]; then
+    rem_args=("${@}")
+    echo "Remaining args: ${rem_args[@]}"
+  fi
+
+}
+
 # BACK UP A FOLDER WITH POSSIBILITY TO EXCLUDE PREFIX
 backup_folder() {
   if [[ ! -z $2 ]]; then
@@ -66,7 +107,10 @@ backup_folder() {
   else
     EXCLUDE=""
   fi
-  pwd
+
+  # list backup folder found
+
+  # force excluded backup
   echo "$1"
   ls "$1"
   if [[ -d "$1" ]]; then
@@ -83,18 +127,11 @@ check_and_create_file() {
   echo test
 }
 
-# user_dirs=("logs" "repos" "setup")
-# user_files=(
+# VARIABLES
+user_dirs=("logs" "repos" "setup")
+user_files=("/logs/init.log" "/logs/errors.log")
 # check_and_create_dir "${user_dirs[@]}"
+# backup_folder "test" "bkp_"
 
-# echo
-# echo -e "${CYAN}Installing base packages:${NC}"
-# sudo apt update | tee -a $HOME/logs/setup_00_init.log
-# echo
-# echo -e "${CYAN}Scanning logs for errors ${NC}"
-# grep -i (err|warn|hit) $HOME/logs/setup_00_init.logs | tee -a $HOME/logs/apt_update_errors.log
-#sudo apt install build essential curl wget software-properties-common gpg net-tools gcc g++ perl make zip unzip git ufw openssl dkms ffmpeg ubuntu-restricted-extras python3 htop > $HOME/logs/setup_00_init.logs
-#echo "Installation issues:"
-#cat $HOME/logs/setup_00_init.logs | grep -i 'error\|warning\|fail\|warn\|err\|!'
-date_string
-echo $BASE_DIR
+
+cd $PREV_DIR

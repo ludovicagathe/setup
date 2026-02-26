@@ -5,14 +5,25 @@ YELLOW='\033[1;33m' # Warning
 CYAN='\033[0;36m' # In progress
 GREEN='\033[1;32m' # Success
 NC='\033[0m' # No color
+
+# VARIABLES
+USER_DIRS=("logs" "repos" "setup")
+USER_FILES=("/logs/init.log" "/logs/errors.log")
+
 # SET BASE DIRECTORY
 if [[ $(basename $PWD) == "setup" ]]; then
   BASE_DIR=$HOME;
 else
-  BASE_DIR=$PWD;
+  BASE_DIR=$PWD/test_home;
 fi
 PREV_DIR=$(pwd)
 cd $BASE_DIR
+## to check if pwd is correct directory
+## else echo error, log to syslog and exit
+
+## to check if current directory is writeable
+## create and delete dummy folder
+## create and delete dummy file
 
 # FUNCTION DEFINITIONS
 # RETURN A TIMESTAMP - DATE STRING WITH TIME
@@ -59,8 +70,81 @@ check_and_create_dir () {
   done
 }
 
+# Parse options using getops
+parse_opts() {
+  local OPTIND=1
+  local opt
+  local rem_args=()
+  local a=false
+
+  while getopts ":vf:ar:" opt; do
+    case "$opt" in
+      v)
+        echo "Verbose mode (-$opt)"
+        ;;
+      f)
+        echo "File required (-$opt): $OPTARG"
+        ;;
+      a)
+        a=true
+        echo "All mode (-a): $a"
+        ;;
+      r)
+        echo "Recurse files (-r): $OPTARG"
+        ;;
+      \?) # invalid options
+        echo "Invalid option: -$OPTARG" >&2
+        ;;
+      :) # missing arguments
+        echo "Option -$OPTARG requires an argument" >&2
+        ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  # store and print remaining arguments
+  if [[ ! -z "${@}" ]]; then
+    rem_args=("${@}")
+    echo "Remaining args: ${rem_args[@]}"
+  fi
+}
+
 # BACK UP A FOLDER WITH POSSIBILITY TO EXCLUDE PREFIX
 backup_folder() {
+  local OPTIND=1
+  local opt
+  local rem_args=()
+  local a=false
+  local EXCLUDE
+
+  while getopts ":e:h" opt; do
+    case "$opt" in
+      h) # help and usage
+        echo "backup_folder -e \"[EXCLUDE PATTERN] [FOLDER]\""
+        echo "e.g."
+        echo "backup_folder -e \"*BKP*\" ./test_home"
+        ;;
+      e) # save exclude pattern to variable
+        EXCLUDE="$OPTARG"
+        ;;
+      \?) # invalid options
+        echo "Invalid option: -$OPTARG" >&2
+        return 1
+        ;;
+      :) # missing arguments
+        echo "Option -$OPTARG requires an argument" >&2
+        return 1
+        ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  # store and print remaining arguments
+  if [[ ! -z "${@}" ]]; then
+    rem_args=("${@}")
+  else
+    echo "${ERR}
+  fi
   if [[ ! -z $2 ]]; then
     EXCLUDE="$2*"
   else
@@ -86,11 +170,8 @@ check_and_create_file() {
   echo test
 }
 
-# VARIABLES
-user_dirs=("logs" "repos" "setup")
-user_files=("/logs/init.log" "/logs/errors.log")
-# check_and_create_dir "${user_dirs[@]}"
-backup_folder "test" "bkp_"
+# check_and_create_dir "${USER_DIRS[@]}"
+# backup_folder "test" "bkp_"
 
 
 cd $PREV_DIR
