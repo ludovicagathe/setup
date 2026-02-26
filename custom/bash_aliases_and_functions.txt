@@ -1,0 +1,15 @@
+# ALIASES
+alias ll="ls -alh"
+alias mkexec="chmod +x"
+
+# FUNCTIONS
+# git commit -am "YYYYmmddHHMM - Details"
+gc_ts() {
+  if [[ -z $1 ]]; then
+    DETAILS="Work in progress"
+  else
+    DETAILS=$1
+  fi
+  git add .
+  git commit -am "$(date +%Y%m%d%H%M) - $DETAILS"
+}
