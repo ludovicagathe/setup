@@ -9,21 +9,38 @@ NC='\033[0m' # No color
 # VARIABLES
 USER_DIRS=("logs" "repos" "setup")
 USER_FILES=("/logs/init.log" "/logs/errors.log")
+BASE_DIR=""
+PREV_DIR=""
+ERRORS=()
+WARNINGS=()
 
 # SET BASE DIRECTORY
-if [[ $(basename $PWD) == "setup" ]]; then
-  BASE_DIR=$HOME;
-else
-  BASE_DIR=$PWD/test_home;
-fi
-PREV_DIR=$(pwd)
-cd $BASE_DIR
-## to check if pwd is correct directory
-## else echo error, log to syslog and exit
+set_base_dir() {
+  if [[ $(basename $PWD) == "setup" ]]; then
+    BASE_DIR=$HOME;
+  else
+    BASE_DIR=$PWD/test_home;
+  fi
+  PREV_DIR=$(pwd)
+  cd $BASE_DIR
+}
 
-## to check if current directory is writeable
-## create and delete dummy folder
-## create and delete dummy file
+## to check if pwd is correct directory
+check_base_dir() {
+  if [[ ! $(pwd) == $BASE_DIR ]]; then
+    ERROR_MESSAGE="The installation directory cannot be accessed. Please verify that you have permission to continue or try again later"
+    ERROR+=($ERROR_MESSAGE)
+    echo "$ERROR_MESSAGE"
+    logger -t $(basename "$0") -p user.err $ERROR_MESSAGE
+    exit 1
+  else
+    echo In correct directory
+  fi
+  ## else echo error, log to syslog and exit
+  ## to check if current directory is writeable
+  ## create and delete dummy folder
+  ## create and delete dummy file
+}
 
 # FUNCTION DEFINITIONS
 # RETURN A TIMESTAMP - DATE STRING WITH TIME
@@ -143,7 +160,7 @@ backup_folder() {
   if [[ ! -z "${@}" ]]; then
     rem_args=("${@}")
   else
-    echo "${ERR}
+    echo "${ERR}"
   fi
   if [[ ! -z $2 ]]; then
     EXCLUDE="$2*"
@@ -170,6 +187,10 @@ check_and_create_file() {
   echo test
 }
 
+# Execute actions
+set_base_dir
+check_base_dir
+pwd
 # check_and_create_dir "${USER_DIRS[@]}"
 # backup_folder "test" "bkp_"
 
