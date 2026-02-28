@@ -1,10 +1,12 @@
 # ALIASES
 alias ll="ls -alh"
 alias mkexec="chmod +x"
+alias aup="sudo apt update && sudo apt upgrade && sudo apt dist-upgrade"
+alias aupr="sudo apt update && sudo apt upgrade && sudo apt dist-upgrade && sudo reboot"
 
 # FUNCTIONS
 # git commit -am "YYYYmmddHHMM - Details"
-gc_ts() {
+gcom() {
   if [[ -z $1 ]]; then
     DETAILS="Work in progress"
   else
@@ -12,4 +14,30 @@ gc_ts() {
   fi
   git add .
   git commit -am "$(date +%Y%m%d%H%M) - $DETAILS"
+}
+
+# git tag -a v1.4 -m "my version 1.4"
+gtag() {
+  local VERSION
+  local MESSAGE
+  if [[ -z "$1" ]];then
+    echo "gtag: Verify and add tag to repo" >&2
+    return 1
+  fi
+  if [[ "$1" =~ ^[v]?[0-9]+(\.[0-9]+)?{2,3}(\-([\.0-9a-zA-Z]+))?$ ]]; then
+    VERSION="$1"
+    if [[ "${1:0:1}" != "v" ]]; then
+      VERSION="v""$VERSION"
+    fi
+  else
+    echo "ERROR: Invalid arguments supplied to gtag. Version number 'v1.2.3' and (optional) 'message' to be supplied" >&2
+    return 1
+  fi
+  if [[ ! -z $2 ]]; then
+    git tag -a "$VERSION" -m "$2"
+    return 0
+  fi
+  
+  git tag "$VERSION"
+  return 0
 }

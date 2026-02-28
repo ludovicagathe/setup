@@ -1,45 +1,22 @@
 #!/bin/bash
 # Scratchpad for testing functionalities
 
-# getops
-
-func() {
-  local OPTIND=1
-  local opt
-  local rem_args=()
-  local a=false
-
-  while getopts ":vf:ar:" opt; do
-    case "$opt" in
-      v)
-        echo "Verbose mode (-$opt)"
-        ;;
-      f)
-        echo "File required (-$opt): $OPTARG"
-        ;;
-      a)
-        a=true
-        echo "All mode (-a): $a"
-        ;;
-      r)
-        echo "Recurse files (-r): $OPTARG"
-        ;;
-      \?) # invalid options
-        echo "Invalid option: -$OPTARG" >&2
-        ;;
-      :) # missing arguments
-        echo "Option -$OPTARG requires an argument" >&2
-        ;;
-    esac
-  done
-  shift $((OPTIND-1))
-
-  # store and print remaining arguments
-  if [[ ! -z "${@}" ]]; then
-    rem_args=("${@}")
-    echo "Remaining args: ${rem_args[@]}"
+detect_version () {
+  local VERSION
+  local MESSAGE
+  if [[ "$1" =~ ^[v]?[0-9]+(\.[0-9]+)?{2,3}(\-([\.0-9a-zA-Z]+))?$ ]]; then
+    VERSION="$1"
+    if [[ "${1:0:1}" != "v" ]]; then
+      VERSION="v""$VERSION"
+    fi
+  else
+    return 1
   fi
-
+  if [[ ! -z $2 ]]; then
+    MESSAGE=$2
+  fi
+  echo "Version: $VERSION"
+  echo "Message: $MESSAGE"
 }
 
-func "$@"
+detect_version $@

@@ -9,37 +9,39 @@ NC='\033[0m' # No color
 # VARIABLES
 USER_DIRS=("logs" "repos" "setup")
 USER_FILES=("/logs/init.log" "/logs/errors.log")
-BASE_DIR=""
-PREV_DIR=""
+BASE_DIR="$HOME"
+PREV_DIR="$(pwd)"
 ERRORS=()
 WARNINGS=()
 
-# SET BASE DIRECTORY
-set_base_dir() {
-  if [[ $(basename $PWD) == "setup" ]]; then
-    BASE_DIR=$HOME;
-  else
+# FUNCTIONS
+set_base_dir() { # Set base directory to either $HOME (production) or test_home (development)
+  if [[ ! $(basename $PWD) == "uboontup" ]]; then
     BASE_DIR=$PWD/test_home;
   fi
-  PREV_DIR=$(pwd)
   cd $BASE_DIR
 }
 
-## to check if pwd is correct directory
-check_base_dir() {
+
+check_base_dir() { # Check if pwd is correct directory
+  local DUMMIES=()
   if [[ ! $(pwd) == $BASE_DIR ]]; then
+    # else echo error, log to syslog and exit
     ERROR_MESSAGE="The installation directory cannot be accessed. Please verify that you have permission to continue or try again later"
     ERROR+=($ERROR_MESSAGE)
     echo "$ERROR_MESSAGE"
     logger -t $(basename "$0") -p user.err $ERROR_MESSAGE
     exit 1
   else
-    echo In correct directory
+    NOW_STR="$(date_string)"
+    mkdir "$NOW_STR""_folder"
+    echo "This is a test file" | tee "$NOW_STR""_folder/""$NOW_STR""_file.txt"
+    
+    ## to check if current directory is writeable
+    ## create and delete dummy folder
+    ## create and delete dummy file
   fi
-  ## else echo error, log to syslog and exit
-  ## to check if current directory is writeable
-  ## create and delete dummy folder
-  ## create and delete dummy file
+  
 }
 
 # FUNCTION DEFINITIONS
@@ -185,6 +187,25 @@ backup_folder() {
 
 check_and_create_file() {
   echo test
+}
+
+detect_version () {
+  local VERSION
+  local MESSAGE
+  if [[ "$1" =~ ^[v]?[0-9]+\.[0-9]+\.[0-9]+[\-]?[\-\.0-9a-zA-Z]?+$ ]]; then
+    VERSION="$1"
+    if [[ "${1:0:1}" != "v" ]]; then
+      VERSION="v""$VERSION"
+    fi
+  else
+
+    return 1
+  fi
+  if [[ ! -z $2 ]]; then
+    MESSAGE=$2
+  fi
+  echo "Version: $VERSION"
+  echo "Message: $MESSAGE"
 }
 
 # Execute actions
