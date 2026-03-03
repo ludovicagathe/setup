@@ -208,12 +208,5 @@ detect_version () {
   echo "Message: $MESSAGE"
 }
 
-# Execute actions
-set_base_dir
-check_base_dir
-pwd
-# check_and_create_dir "${USER_DIRS[@]}"
-# backup_folder "test" "bkp_"
-
 
 cd $PREV_DIR
