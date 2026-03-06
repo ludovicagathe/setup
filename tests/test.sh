@@ -34,45 +34,65 @@ set_base_dir() { # Set base directory to either $HOME (production) or test_home 
 }
 
 check_base_dir() { # Check if pwd is correct directory
-  cd ..
   if [[ ! $(pwd) == $BASE_DIR ]]; then
     # else echo error, log to syslog and exit
-    ERROR_MESSAGE="The installation directory cannot be accessed. Please verify that you have permission to continue or try again later"
-    ERRORS+=($ERROR_MESSAGE)
-    echo "${ERRORS[@]}"
+    ERROR_MESSAGE="The installation directory cannot be accessed. Please verify that you have permission to continue or try again later."
+    ERRORS+=("$ERROR_MESSAGE")
     echo -e "${RED}ERRORS:${NC}"
     printf "%s\n" "${ERRORS[@]}"
     logger -t $(basename "$0") -p user.err $ERROR_MESSAGE
     exit 1
-  else
-    NOW_STR="$(date_string)"
-    echo "before temp"
-    ls
-    mkdir "$NOW_STR""_folder"
-    echo "after temp"
-    ls
-    echo "This is a test file" | tee "$NOW_STR""_folder/""$NOW_STR""_file.txt"
-    if [[ -d "$NOW_STR" && -f "$NOW_STR""_folder/""$NOW_STR""_file.txt" ]]; then
-      echo -e "${GREEN}Directory $NOW_STR""_folder is writable${NC}"
-      rm -r "$NOW_STR""_folder"
-      echo after rm
-      ls
-      if [[ -d "$NOW_STR""_folder" ]]; then
-        echo -e "${YELLOW}Temporary files could not be removed${NC}"
-        echo
-        if [[ "$(ask_confirmation 'Do you want to proceed with installation? anyway')" != "y" ]]; then
-          echo "${RED}Aborting installation. Goodbye!${NC}"
-          exit 1
-        fi
-      fi
-    else
-      ERROR_MESSAGE="The base directory is not writable"
-      ERRORS+=($ERROR_MESSAGE)
-      echo -e "${RED}ERRORS:${NC}"
-      printf "%s\n" "${ERRORS[@]}"
-      logger -t $(basename "$0") -p user.err $ERROR_MESSAGE
+  fi
+}
+
+check_base_dir_write() {
+  NOW_STR="$(date_string)"
+  echo "before temp"
+  ls
+  mkdir "$NOW_STR""_folder"
+  echo "after temp"
+  ls
+  echo "This is a test file" | tee "$NOW_STR""_folder/""$NOW_STR""_file.txt"
+  if [[ -d "$NOW_STR""_folder" && -f "$NOW_STR""_folder/""$NOW_STR""_file.txt" ]]; then
+    echo -e "${GREEN}Directory $NOW_STR""_folder is writable${NC}"
+    rm "$NOW_STR""_folder/""$NOW_STR""_file"
+    if [[ $? -ne 0 ]]; then
+      echo "ERROR!!!"
       exit 1
+    else
+      echo "ALL IS VELL"
     fi
+    rm -r "$NOW_STR""_folder"
+    if [[ $? -ne 0 ]]; then
+      echo "ERROR!!!"
+      exit 1
+    else
+      echo "ALL IS VELL"
+    fi
+#     echo after rm
+#     ls
+#     # if [[ -d "$NOW_STR""_folder" ]]; then
+#     #   echo -e "${YELLOW}Temporary files could not be removed${NC}"
+#     #   echo
+#     #   if [[ "$(ask_confirmation 'Do you want to proceed with installation anyway? Some items may not install correctly.')" != "y" ]]; then
+#     #     echo "${RED}Aborting installation. Goodbye!${NC}"
+#     #     exit 1
+#     #   fi
+#     # fi
+#   else
+#     ERROR_MESSAGE="The base directory is not writable"
+#     ERRORS+=($ERROR_MESSAGE)
+#     echo -e "${RED}ERRORS:${NC}"
+#     printf "%s\n" "${ERRORS[@]}"
+#     logger -t $(basename "$0") -p user.err $ERROR_MESSAGE
+#     exit 1
+  else
+    ERROR_MESSAGE="The installation directory cannot be written to. Please verify that you have permission to continue or try again later."
+    ERRORS+=("$ERROR_MESSAGE")
+    echo -e "${RED}ERRORS:${NC}"
+    printf "%s\n" "${ERRORS[@]}"
+    logger -t $(basename "$0") -p user.err $ERROR_MESSAGE
+    exit 1
   fi
 }
 
@@ -95,12 +115,11 @@ ask_confirmation() {
   fi
 }
 
-enable_bash_customisations
+# enable_bash_customisations
 # Execute actions
 set_base_dir
-pwd
 check_base_dir
-pwd
+check_base_dir_write
 # check_and_create_dir "${USER_DIRS[@]}"
 # backup_folder "test" "bkp_"
 
