@@ -10,15 +10,22 @@ USER_DIRS=("logs" "repos" "setup")
 USER_FILES=("/logs/init.log" "/logs/errors.log")
 BASE_DIR="$HOME"
 PREV_DIR="$(pwd)"
-ERRORS=()
 WARNINGS=()
+ERRORS=()
 
 # FUNCTIONS
-enable_bash_customisations() {
-  if [[ -f "$HOME/.bashrc" ]]; then
+enable_bash_customisations() { # Check .bashrc and source from customisation files
+  local BASHRC_FILE="$HOME/.bashrc"
+  local INSERT=""
+  if [[ -f "$BASHRC_FILE" ]]; then
+    if [[ ! -z $(cat "$BASHRC_FILE" | grep "source $HOME/setup/bash_aliases_and_functions") ]]; then
+      echo -e "${YELLOW}Bash customisations found${NC}"
+      return 0
+    fi
     if [[ "$(ask_confirmation 'Install bash aliases and helper functions to your .bashrc?')" == "y" ]]; then
       echo
-      echo "install customisations"
+      INSERT="\n## Bash customisations (v0.1): aliases and functions\nsource $HOME/setup/bash_aliases_and_functions"
+      echo -e "$INSERT" >> "$BASHRC_FILE"
     else
       echo
       return 0
@@ -33,15 +40,14 @@ set_base_dir() { # Set base directory to either $HOME (production) or test_home 
   cd $BASE_DIR
 }
 
+critical_exit() {
+  
+}
+
 check_base_dir() { # Check if pwd is correct directory
   if [[ ! $(pwd) == $BASE_DIR ]]; then
     # else echo error, log to syslog and exit
-    ERROR_MESSAGE="The installation directory cannot be accessed. Please verify that you have permission to continue or try again later."
-    ERRORS+=("$ERROR_MESSAGE")
-    echo -e "${RED}ERRORS:${NC}"
-    printf "%s\n" "${ERRORS[@]}"
-    logger -t $(basename "$0") -p user.err $ERROR_MESSAGE
-    exit 1
+    
   fi
 }
 
