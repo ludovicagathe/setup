@@ -1,0 +1,12 @@
+-[ ] Documentation
+-[ ] Helper functions
+-[ ] Get package list
+-[ ] Install packages
+-[ ] Install benchmark tools
+-[ ] Benchmark services
+-[ ] Optimise configurations
+-[ ] Benchmark after optimisation
+-[ ] Harden
+-[ ] Scan for vulnerabilities
+-[ ] Address vulnerabilities
+-[ ] Benchmark after hardening

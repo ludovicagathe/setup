@@ -24,7 +24,7 @@ This is a work in progress which is still basic in terms of features and at a ve
 * **Runtime:** Node.js, Python
 * **Webserver:** (e.g., Nginx or Apache)
 * **Database:** (e.g., PostgreSQL, MySQL, or MongoDB)
-* **In-Memory Cache:** (e.g., Redis or Memcached)
+* **In-Memory Cache:** (e.g., Redis or Valkey)
 
 ---
 
@@ -38,7 +38,7 @@ This is a work in progress which is still basic in terms of features and at a ve
 
 ```bash
 # Clone the repository
-git clone [https://github.com/yourusername/uboontup.git](https://github.com/yourusername/uboontup.git)
+git clone https://github.com/ludovicagathe/uboontup.git
 
 # Navigate to the directory
 cd uboontup
@@ -56,7 +56,7 @@ A test suite is provided that will simulate the script and will not make any per
 
 ```bash
 # Clone the repository
-git clone [https://github.com/yourusername/uboontup.git](https://github.com/yourusername/uboontup.git)
+git clone https://github.com/ludovicagathe/uboontup.git
 
 # Navigate to the directory
 cd uboontup/tests
