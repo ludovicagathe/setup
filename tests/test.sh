@@ -18,7 +18,7 @@ enable_bash_customisations() { # Check .bashrc and source from customisation fil
   local BASHRC_FILE="$HOME/.bashrc"
   local INSERT=""
   if [[ -f "$BASHRC_FILE" ]]; then
-    if [[ ! -z $(cat "$BASHRC_FILE" | grep "source $HOME/setup/bash_aliases_and_functions") ]]; then
+    if [[ ! -z $(cat "$BASHRC_FILE"|grep "source $HOME/setup/bash_aliases_and_functions") ]]; then
       echo -e "${YELLOW}Bash customisations found${NC}"
       return 0
     fi
@@ -58,7 +58,7 @@ check_base_dir_write() {
   mkdir "$NOW_STR""_folder"
   echo "after temp"
   ls
-  echo "This is a test file" | tee "$NOW_STR""_folder/""$NOW_STR""_file.txt"
+  echo "This is a test file"|tee "$NOW_STR""_folder/""$NOW_STR""_file.txt"
   if [[ -d "$NOW_STR""_folder" && -f "$NOW_STR""_folder/""$NOW_STR""_file.txt" ]]; then
     echo -e "${GREEN}Directory $NOW_STR""_folder is writable${NC}"
     rm "$NOW_STR""_folder/""$NOW_STR""_file"

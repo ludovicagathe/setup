@@ -35,7 +35,7 @@ check_base_dir() { # Check if pwd is correct directory
   else
     NOW_STR="$(date_string)"
     mkdir "$NOW_STR""_folder"
-    echo "This is a test file" | tee "$NOW_STR""_folder/""$NOW_STR""_file.txt"
+    echo "This is a test file"|tee "$NOW_STR""_folder/""$NOW_STR""_file.txt"
     
     ## to check if current directory is writeable
     ## create and delete dummy folder
@@ -70,7 +70,7 @@ ask_confirmation() {
 check_and_create_dir () {
   for user_dir in "$@"; do
     if [[ -d "$BASE_DIR/$user_dir" ]]; then
-      echo -e "$BASE_DIR/$user_dir ${RED}already exits${NC}" | tee -a $BASE_DIR/logs/setup_00_init.log
+      echo -e "$BASE_DIR/$user_dir ${RED}already exits${NC}"|tee -a $BASE_DIR/logs/setup_00_init.log
       if [[ $(ask_confirmation "Back up folder contents?") == 'y' ]]; then
         echo
         BKP_STR="bkp_$(date_string)"
